@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>객실와인 리스트</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f4f5f7;
+      color: #222;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #111827;
+      color: white;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    header h1 {
+      margin: 0 0 12px 0;
+      font-size: 22px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    select,
+    input {
+      font-size: 16px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+    }
+
+    select {
+      min-width: 160px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    main {
+      padding: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .summary {
+      margin-bottom: 14px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .image-wrap {
+      width: 100%;
+      height: 220px;
+      background: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #777;
+      font-size: 14px;
+      overflow: hidden;
+    }
+
+    .image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .content {
+      padding: 14px;
+    }
+
+    .code {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .name {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 8px;
+      white-space: pre-line;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 6px 8px;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .label {
+      color: #666;
+      font-weight: 700;
+    }
+
+    .value {
+      color: #222;
+      white-space: pre-line;
+    }
+
+    .qty-zero {
+      color: red;
+      font-weight: 800;
+    }
+
+    .price {
+      font-weight: 800;
+    }
+
+    .note {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 10px;
+      background: #fff7ed;
+      color: #9a3412;
+      font-size: 13px;
+      white-space: pre-line;
+    }
+
+    .loading,
+    .error,
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .refresh-btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .refresh-btn:active {
+      transform: scale(0.98);
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 19px;
+      }
+
+      .image-wrap {
+        height: 200px;
+      }
+
+      main {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>객실와인 리스트</h1>
+
+    <div class="filter-row">
+      <select id="typeFilter">
+        <option value="">전체 종류</option>
+      </select>
+
+      <input id="searchInput" type="text" placeholder="와인명 / 관리번호 / 생산국 검색" />
+
+      <button class="refresh-btn" onclick="loadData()">새로고침</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="summary" class="summary"></div>
+    <div id="list" class="grid"></div>
+  </main>
+
+  <script>
+    const API_URL = '여기에_Apps_Script_웹앱_URL';
+
+    let allData = [];
+
+    const typeFilter = document.getElementById('typeFilter');
+    const searchInput = document.getElementById('searchInput');
+    const list = document.getElementById('list');
+    const summary = document.getElementById('summary');
+
+    async function loadData() {
+      list.innerHTML = '<div class="loading">불러오는 중...</div>';
+      summary.textContent = '';
+
+      try {
+        const res = await fetch(API_URL);
+        const json = await res.json();
+
+        if (!json.ok) {
+          throw new Error(json.error || '데이터를 불러오지 못했습니다.');
+        }
+
+        allData = json.data || [];
+
+        renderTypeOptions(json.types || []);
+        renderList();
+
+      } catch (err) {
+        list.innerHTML = `
+          <div class="error">
+            데이터를 불러오지 못했습니다.<br>
+            ${err.message}
+          </div>
+        `;
+      }
+    }
+
+    function renderTypeOptions(types) {
+      const current = typeFilter.value;
+
+      typeFilter.innerHTML = '<option value="">전체 종류</option>';
+
+      types.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type;
+        typeFilter.appendChild(option);
+      });
+
+      typeFilter.value = current;
+    }
+
+    function renderList() {
+      const selectedType = typeFilter.value;
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      let filtered = allData.filter(item => {
+        const matchType = !selectedType || item.type === selectedType;
+
+        const searchText = [
+          item.code,
+          item.type,
+          item.name,
+          item.vintage,
+          item.country,
+          item.storage,
+          item.note
+        ].join(' ').toLowerCase();
+
+        const matchKeyword = !keyword || searchText.includes(keyword);
+
+        return matchType && matchKeyword;
+      });
+
+      summary.textContent = `총 ${filtered.length}개 표시 중 / 전체 ${allData.length}개`;
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="empty">표시할 와인이 없습니다.</div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(item => createCard(item)).join('');
+
+      loadImages();
+    }
+
+    function createCard(item) {
+      const quantityClass = String(item.quantity).includes('0') ? 'qty-zero' : '';
+
+      return `
+        <div class="card">
+          <div class="image-wrap" data-code="${escapeHtml(item.code)}">
+            사진 불러오는 중...
+          </div>
+
+          <div class="content">
+            <div class="code">${escapeHtml(item.code)}</div>
+            <div class="name">${escapeHtml(item.name)}</div>
+
+            <div class="meta">
+              <div class="label">종류</div>
+              <div class="value">${escapeHtml(item.type)}</div>
+
+              <div class="label">빈티지</div>
+              <div class="value">${escapeHtml(item.vintage)}</div>
+
+              <div class="label">생산국</div>
+              <div class="value">${escapeHtml(item.country)}</div>
+
+              <div class="label">보관장소</div>
+              <div class="value">${escapeHtml(item.storage)}</div>
+
+              <div class="label">보유수량</div>
+              <div class="value ${quantityClass}">${escapeHtml(item.quantity)}</div>
+
+              <div class="label">서비스</div>
+              <div class="value">${escapeHtml(item.service)}</div>
+
+              <div class="label">수령이력</div>
+              <div class="value">${escapeHtml(item.receiveHistory)}</div>
+
+              <div class="label">구매이력</div>
+              <div class="value">${escapeHtml(item.purchaseHistory)}</div>
+
+              <div class="label">가격</div>
+              <div class="value price">${escapeHtml(item.price)}</div>
+            </div>
+
+            ${item.note ? `<div class="note">${escapeHtml(item.note)}</div>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadImages() {
+      const imageBoxes = document.querySelectorAll('.image-wrap');
+
+      imageBoxes.forEach(async box => {
+        const code = box.dataset.code;
+
+        try {
+          const res = await fetch(`${API_URL}?action=image&code=${encodeURIComponent(code)}`);
+          const base64 = await res.text();
+
+          if (!base64 || base64.includes('Image not found')) {
+            box.textContent = '사진 없음';
+            return;
+          }
+
+          const img = document.createElement('img');
+          img.src = `data:image/jpeg;base64,${base64}`;
+          img.alt = code;
+
+          box.innerHTML = '';
+          box.appendChild(img);
+
+        } catch (err) {
+          box.textContent = '사진 로딩 실패';
+        }
+      });
+    }
+
+    function escapeHtml(value) {
+      if (value === null || value === undefined) return '';
+
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    typeFilter.addEventListener('change', renderList);
+    searchInput.addEventListener('input', renderList);
+
+    loadData();
+  </script>
+</body>
+</html>
