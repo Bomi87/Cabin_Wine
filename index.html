@@ -609,32 +609,55 @@ async function loadData() {
   summary.textContent = '';
   updated.textContent = '';
 
-      try {
-        const json = await jsonp(API_URL + '?action=list&ts=' + Date.now());
+  // 1) 브라우저에 저장된 이전 데이터 즉시 표시
+  const saved = localStorage.getItem('CABIN_BEVERAGE_CACHE');
 
-        if (!json.ok) {
-          throw new Error(json.error || '데이터를 불러오지 못했습니다.');
-        }
+  if (saved) {
+    try {
+      const cachedJson = JSON.parse(saved);
 
-        allData = json.data || [];
-        imageCache = {};
-
-        renderTypeOptions(json.types || []);
-        updated.textContent = json.updatedAt ? `업데이트: ${json.updatedAt}` : '';
-
+      if (cachedJson && cachedJson.ok && Array.isArray(cachedJson.data)) {
+        allData = cachedJson.data || [];
+        renderTypeOptions(cachedJson.types || []);
+        updated.textContent = cachedJson.updatedAt ? `저장된 데이터: ${cachedJson.updatedAt}` : '저장된 데이터';
         renderList();
-
-      } catch (err) {
-        list.innerHTML = `
-          <div class="error">
-            데이터를 불러오지 못했습니다.<br>
-            ${escapeHtml(err.message)}
-            <br><br>
-            Apps Script URL 또는 배포 권한을 확인해주세요.
-          </div>
-        `;
       }
+    } catch (err) {
+      localStorage.removeItem('CABIN_BEVERAGE_CACHE');
     }
+  }
+
+  // 2) 최신 데이터 다시 호출
+  try {
+    const json = await jsonp(API_URL + '?action=list&ts=' + Date.now());
+
+    if (!json.ok) {
+      throw new Error(json.error || '데이터를 불러오지 못했습니다.');
+    }
+
+    allData = json.data || [];
+    imageCache = {};
+
+    localStorage.setItem('CABIN_BEVERAGE_CACHE', JSON.stringify(json));
+
+    renderTypeOptions(json.types || []);
+    updated.textContent = json.updatedAt ? `업데이트: ${json.updatedAt}` : '';
+
+    renderList();
+
+  } catch (err) {
+    if (!saved) {
+      list.innerHTML = `
+        <div class="error">
+          데이터를 불러오지 못했습니다.<br>
+          ${escapeHtml(err.message)}
+          <br><br>
+          Apps Script URL 또는 배포 권한을 확인해주세요.
+        </div>
+      `;
+    }
+  }
+}
 
     function renderTypeOptions(types) {
       const current = typeFilter.value;
