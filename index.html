@@ -689,7 +689,7 @@
               <div class="label">가격</div>
               <div class="value price">${escapeHtml(item.price)}</div>
 
-              <div class="label">수령</div>
+              <div class="label">서비스</div>
               <div class="value">${escapeHtml(shortText(item.receiveHistory, 45))}</div>
             </div>
 
@@ -768,7 +768,7 @@
         ${detailRow('보관장소', item.storage)}
         ${detailRow('보유수량', item.quantity)}
         ${detailRow('서비스 사용중', item.service)}
-        ${detailRow('수령 이력', item.receiveHistory)}
+        ${detailRow('소진 이력', item.receiveHistory)}
         ${detailRow('구매 이력', item.purchaseHistory)}
         ${detailRow('와인가격', item.price)}
         ${detailRow('특이 사항', item.note)}
