@@ -40,11 +40,26 @@
       margin-bottom: 12px;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 900;
-    }
+h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.brand-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  background: white;
+  border-radius: 8px;
+  padding: 3px;
+}
 
     .refresh-btn {
       border: none;
@@ -433,7 +448,10 @@
 <body>
   <header>
     <div class="title-row">
-      <h1>Cabin_Beverage List</h1>
+     <h1 class="brand-title">
+  <img src="SK_LOGO.png" alt="SK Logo" class="brand-logo">
+  <span>Cabin Beverage List</span>
+</h1>
       <button class="refresh-btn" onclick="loadData()">↻ 새로고침</button>
     </div>
 
@@ -726,41 +744,40 @@
 }
   
 
-    async function openModal(code) {
-      const item = allData.find(x => x.code === code);
-      if (!item) return;
+function openModal(code) {
+  const item = allData.find(x => x.code === code);
+  if (!item) return;
 
-      modalBackdrop.classList.add('show');
+  modalBackdrop.classList.add('show');
 
-      modalCode.textContent = item.code || '';
-      modalTitle.textContent = item.name || '';
-      modalImage.textContent = '사진 불러오는 중...';
+  modalCode.textContent = item.code || '';
+  modalTitle.textContent = item.name || '';
 
-      modalDetail.innerHTML = `
-        ${detailRow('종류', item.type)}
-        ${detailRow('빈티지', item.vintage)}
-        ${detailRow('생산국', item.country)}
-        ${detailRow('보관장소', item.storage)}
-        ${detailRow('보유수량', item.quantity)}
-        ${detailRow('서비스 사용중', item.service)}
-        ${detailRow('소진 이력', item.receiveHistory)}
-        ${detailRow('구매 이력', item.purchaseHistory)}
-        ${detailRow('와인가격', item.price)}
-        ${detailRow('특이 사항', item.note)}
-      `;
+  if (item.imageUrl) {
+    modalImage.innerHTML = `
+      <img 
+        src="${escapeAttr(item.imageUrl)}" 
+        alt="${escapeAttr(item.code)}"
+        onerror="this.parentElement.textContent='사진 없음';"
+      >
+    `;
+  } else {
+    modalImage.textContent = '사진 없음';
+  }
 
-      try {
-        const imageData = await getImageData(item.code);
-
-        if (imageData) {
-          modalImage.innerHTML = `<img src="${imageData}" alt="${escapeAttr(item.code)}">`;
-        } else {
-          modalImage.textContent = '사진 없음';
-        }
-      } catch (err) {
-        modalImage.textContent = '사진 로딩 실패';
-      }
-    }
+  modalDetail.innerHTML = `
+    ${detailRow('종류', item.type)}
+    ${detailRow('빈티지', item.vintage)}
+    ${detailRow('생산국', item.country)}
+    ${detailRow('보관장소', item.storage)}
+    ${detailRow('보유수량', item.quantity)}
+    ${detailRow('서비스 사용중', item.service)}
+    ${detailRow('소진 이력', item.receiveHistory)}
+    ${detailRow('구매 이력', item.purchaseHistory)}
+    ${detailRow('와인가격', item.price)}
+    ${detailRow('특이 사항', item.note)}
+  `;
+}
 
     function detailRow(label, value) {
       return `
