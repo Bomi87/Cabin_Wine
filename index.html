@@ -456,9 +456,55 @@
         grid-template-columns: 1fr;
       }
 
-      .image-wrap {
-        height: 230px;
-      }
+    .image-wrap {
+  height: 155px;
+}
+
+.card {
+  border-radius: 14px;
+}
+
+.card-body {
+  padding: 10px 12px;
+}
+
+.code {
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
+.name {
+  font-size: 14px;
+  line-height: 1.25;
+  min-height: auto;
+  margin-bottom: 7px;
+}
+
+.quick-info {
+  gap: 4px;
+  margin-bottom: 7px;
+}
+
+.chip {
+  font-size: 11px;
+  padding: 4px 7px;
+}
+
+.meta {
+  grid-template-columns: 62px 1fr;
+  gap: 3px 6px;
+  font-size: 12px;
+}
+
+.note {
+  margin-top: 7px;
+  padding: 6px;
+  font-size: 12px;
+}
+
+.grid {
+  gap: 10px;
+}
 
       .status-row {
         display: block;
@@ -660,22 +706,39 @@ async function loadData() {
   }
 }
 
-    function renderTypeOptions(types) {
-      const current = typeFilter.value;
+function renderTypeOptions(types) {
+  const current = typeFilter.value;
 
-      typeFilter.innerHTML = '<option value="">전체 종류</option>';
+  const fixedOrder = [
+    '레드',
+    '화이트',
+    '위스키',
+    '보드카',
+    '샴페인',
+    '맥주'
+  ];
 
-      types.forEach(type => {
-        const option = document.createElement('option');
-        option.value = type;
-        option.textContent = type;
-        typeFilter.appendChild(option);
-      });
+  const uniqueTypes = [...new Set(types.filter(Boolean))];
 
-      if ([...typeFilter.options].some(opt => opt.value === current)) {
-        typeFilter.value = current;
-      }
-    }
+  const orderedTypes = fixedOrder.filter(type => uniqueTypes.includes(type));
+
+  const extraTypes = uniqueTypes.filter(type => !fixedOrder.includes(type));
+
+  const finalTypes = [...orderedTypes, ...extraTypes];
+
+  typeFilter.innerHTML = '<option value="">전체 종류</option>';
+
+  finalTypes.forEach(type => {
+    const option = document.createElement('option');
+    option.value = type;
+    option.textContent = type;
+    typeFilter.appendChild(option);
+  });
+
+  if ([...typeFilter.options].some(opt => opt.value === current)) {
+    typeFilter.value = current;
+  }
+}
 
     function toggleStock() {
       excludeZeroStock = !excludeZeroStock;
