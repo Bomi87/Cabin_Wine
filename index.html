@@ -485,7 +485,7 @@
 
   <script>
 
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwUtRnHW0J_bNOn7Eiwz_ccNgnaDxu2YIP_PBMNl6Ggz4PQ5FCduSkxvQlVzhZ4wJRr/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwRG3fl2h6hQYo5FxE7MTGZWBLpIfOjhxMsMhUKfsabQj_pDLF-A4AB-rRJpuTkf7gz/exec';
 
     let allData = [];
     let excludeZeroStock = false;
@@ -699,57 +699,32 @@
       `;
     }
 
-    async function loadImages() {
-      const imageBoxes = document.querySelectorAll('.image-wrap');
+ function loadImages() {
+  const imageBoxes = document.querySelectorAll('.image-wrap');
 
-      imageBoxes.forEach(async box => {
-        const code = box.dataset.code;
+  imageBoxes.forEach(box => {
+    const code = box.dataset.code;
+    const item = allData.find(x => x.code === code);
 
-        if (!code) {
-          box.textContent = '사진 없음';
-          return;
-        }
-
-        try {
-          const imageData = await getImageData(code);
-
-          if (!imageData) {
-            box.innerHTML = `<span class="badge">사진 없음</span>사진 없음`;
-            return;
-          }
-
-          const typeBadge = box.querySelector('.badge')?.outerHTML || '';
-
-          box.innerHTML = `
-            ${typeBadge}
-            <img src="${imageData}" alt="${escapeAttr(code)}">
-          `;
-
-        } catch (err) {
-          box.innerHTML = `<span class="badge">오류</span>사진 로딩 실패`;
-        }
-      });
+    if (!item || !item.imageUrl) {
+      box.innerHTML = `<span class="badge">사진 없음</span>사진 없음`;
+      return;
     }
 
-    async function getImageData(code) {
-      if (imageCache[code] !== undefined) {
-        return imageCache[code];
-      }
+    const typeBadge = box.querySelector('.badge')?.outerHTML || '';
 
-      const json = await jsonp(
-        `${API_URL}?action=image&code=${encodeURIComponent(code)}&ts=${Date.now()}`
-      );
-
-      if (!json.ok || !json.base64) {
-        imageCache[code] = '';
-        return '';
-      }
-
-      const dataUrl = `data:${json.mimeType || 'image/jpeg'};base64,${json.base64}`;
-      imageCache[code] = dataUrl;
-
-      return dataUrl;
-    }
+    box.innerHTML = `
+      ${typeBadge}
+      <img 
+        src="${escapeAttr(item.imageUrl)}" 
+        alt="${escapeAttr(item.code)}"
+        loading="lazy"
+        onerror="this.parentElement.innerHTML='<span class=&quot;badge&quot;>사진 없음</span>사진 없음';"
+      >
+    `;
+  });
+}
+  
 
     async function openModal(code) {
       const item = allData.find(x => x.code === code);
