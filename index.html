@@ -691,28 +691,34 @@ async function loadData() {
     }
 
     function getFilteredData() {
-      const selectedType = typeFilter.value;
-      const keyword = searchInput.value.trim().toLowerCase();
+    const selectedType = typeFilter.value;
+const rawKeyword = searchInput.value.trim().toLowerCase();
+const keyword = normalizeSearchText(rawKeyword);
 
       let filtered = allData.filter(item => {
         const matchType = !selectedType || item.type === selectedType;
 
-        const searchText = [
-          item.code,
-          item.type,
-          item.name,
-          item.vintage,
-          item.country,
-          item.storage,
-          item.quantity,
-          item.service,
-          item.receiveHistory,
-          item.purchaseHistory,
-          item.price,
-          item.note
-        ].join(' ').toLowerCase();
+  const searchText = [
+  item.code,
+  item.type,
+  item.name,
+  item.vintage,
+  item.country,
+  item.storage,
+  item.quantity,
+  item.service,
+  item.receiveHistory,
+  item.purchaseHistory,
+  item.price,
+  item.note
+].join(' ').toLowerCase();
 
-        const matchKeyword = !keyword || searchText.includes(keyword);
+const normalizedSearchText = normalizeSearchText(searchText);
+
+const matchKeyword =
+  !keyword ||
+  searchText.includes(rawKeyword) ||
+  normalizedSearchText.includes(keyword);
         const matchStock = !excludeZeroStock || Number(item.quantityNumber || 0) > 0;
 
         return matchType && matchKeyword && matchStock;
@@ -891,13 +897,21 @@ async function loadData() {
         .replaceAll("'", '&#039;');
     }
 
-    function escapeAttr(value) {
-      return escapeHtml(value).replaceAll('\n', ' ');
-    }
+function escapeAttr(value) {
+  return escapeHtml(value).replaceAll('\n', ' ');
+}
 
-    typeFilter.addEventListener('change', renderList);
-    sortFilter.addEventListener('change', renderList);
-    searchInput.addEventListener('input', renderList);
+function normalizeSearchText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/\s+/g, '')           // 모든 공백 제거
+    .replace(/[()［］\[\]{}]/g, '') // 괄호 제거
+    .replace(/[ㆍ·,._\-\/]/g, '');  // 특수문자 일부 제거
+}
+
+typeFilter.addEventListener('change', renderList);
+sortFilter.addEventListener('change', renderList);
+searchInput.addEventListener('input', renderList);
 
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape') {
