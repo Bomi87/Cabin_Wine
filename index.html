@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
   <title>객실와인 리스트</title>
 
@@ -11,67 +11,131 @@
       box-sizing: border-box;
     }
 
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f4f5f7;
-      color: #222;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
     }
 
     header {
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
       background: #111827;
       color: white;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      padding: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.22);
     }
 
-    header h1 {
-      margin: 0 0 12px 0;
-      font-size: 22px;
-    }
-
-    .filter-row {
+    .title-row {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .refresh-btn {
+      border: none;
+      background: rgba(255,255,255,0.14);
+      color: white;
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .refresh-btn:active {
+      transform: scale(0.97);
+    }
+
+    .control-panel {
+      display: grid;
+      grid-template-columns: 200px 200px 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    select,
+    input,
+    button {
+      font-size: 16px;
+      font-family: inherit;
     }
 
     select,
     input {
-      font-size: 16px;
-      padding: 10px 12px;
-      border-radius: 10px;
+      width: 100%;
       border: none;
+      border-radius: 12px;
+      padding: 12px 13px;
       outline: none;
+      background: white;
+      color: #111827;
     }
 
-    select {
-      min-width: 160px;
+    input::placeholder {
+      color: #9ca3af;
     }
 
-    input {
-      flex: 1;
-      min-width: 180px;
+    .toggle-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #e5e7eb;
+      color: #111827;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .toggle-btn.active {
+      background: #2563eb;
+      color: white;
     }
 
     main {
-      padding: 16px;
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
+      padding: 18px 14px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      color: #4b5563;
+      font-size: 13px;
     }
 
     .summary {
-      margin-bottom: 14px;
-      font-size: 14px;
-      color: #555;
+      font-weight: 800;
+    }
+
+    .updated {
+      text-align: right;
+      font-size: 12px;
+      color: #6b7280;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
       gap: 16px;
     }
 
@@ -79,21 +143,28 @@
       background: white;
       border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      display: flex;
-      flex-direction: column;
+      box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 9px 26px rgba(0,0,0,0.12);
     }
 
     .image-wrap {
       width: 100%;
-      height: 220px;
+      height: 235px;
       background: #e5e7eb;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #777;
+      color: #6b7280;
       font-size: 14px;
       overflow: hidden;
+      position: relative;
+      text-align: center;
     }
 
     .image-wrap img {
@@ -103,50 +174,80 @@
       display: block;
     }
 
-    .content {
+    .badge {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      background: rgba(17,24,39,0.78);
+      color: white;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 900;
+      z-index: 2;
+    }
+
+    .card-body {
       padding: 14px;
     }
 
     .code {
       font-size: 13px;
-      color: #555;
+      color: #2563eb;
+      font-weight: 900;
       margin-bottom: 4px;
-      font-weight: 700;
     }
 
     .name {
       font-size: 16px;
-      font-weight: 800;
       line-height: 1.35;
-      margin-bottom: 8px;
+      font-weight: 900;
       white-space: pre-line;
+      min-height: 44px;
+      margin-bottom: 10px;
+    }
+
+    .quick-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 5px 8px;
+      background: #f3f4f6;
+      font-size: 12px;
+      font-weight: 800;
+      color: #374151;
+    }
+
+    .chip.zero {
+      background: #fee2e2;
+      color: #dc2626;
     }
 
     .meta {
       display: grid;
-      grid-template-columns: 90px 1fr;
-      gap: 6px 8px;
+      grid-template-columns: 76px 1fr;
+      gap: 5px 8px;
       font-size: 13px;
-      margin-top: 10px;
     }
 
     .label {
-      color: #666;
-      font-weight: 700;
+      color: #6b7280;
+      font-weight: 900;
     }
 
     .value {
-      color: #222;
+      color: #111827;
       white-space: pre-line;
-    }
-
-    .qty-zero {
-      color: red;
-      font-weight: 800;
+      word-break: break-word;
     }
 
     .price {
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .note {
@@ -156,42 +257,174 @@
       background: #fff7ed;
       color: #9a3412;
       font-size: 13px;
+      font-weight: 800;
       white-space: pre-line;
     }
 
     .loading,
     .error,
     .empty {
+      grid-column: 1 / -1;
       text-align: center;
-      padding: 40px 20px;
-      color: #666;
+      padding: 48px 18px;
+      color: #6b7280;
+      background: white;
+      border-radius: 18px;
+      line-height: 1.6;
     }
 
-    .refresh-btn {
-      padding: 10px 14px;
-      border-radius: 10px;
+    .error {
+      color: #dc2626;
+      font-weight: 800;
+    }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.55);
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.show {
+      display: block;
+    }
+
+    .modal {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    .modal-image {
+      width: 100%;
+      height: 430px;
+      background: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .modal-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #111827;
+    }
+
+    .modal-body {
+      padding: 18px;
+    }
+
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 22px;
+      line-height: 1.35;
+      font-weight: 900;
+      white-space: pre-line;
+    }
+
+    .close-btn {
       border: none;
-      background: #2563eb;
-      color: white;
-      font-weight: 700;
+      background: #f3f4f6;
+      color: #111827;
+      border-radius: 999px;
+      width: 38px;
+      height: 38px;
+      font-size: 22px;
+      font-weight: 900;
       cursor: pointer;
+      flex: 0 0 auto;
     }
 
-    .refresh-btn:active {
-      transform: scale(0.98);
+    .detail-table {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 8px 12px;
+      margin-top: 14px;
+      font-size: 14px;
     }
 
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 19px;
+    .detail-label {
+      color: #6b7280;
+      font-weight: 900;
+    }
+
+    .detail-value {
+      color: #111827;
+      white-space: pre-line;
+      word-break: break-word;
+    }
+
+    @media (max-width: 800px) {
+      header {
+        padding: 12px;
       }
 
-      .image-wrap {
-        height: 200px;
+      h1 {
+        font-size: 20px;
+      }
+
+      .control-panel {
+        grid-template-columns: 1fr;
       }
 
       main {
         padding: 12px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .image-wrap {
+        height: 230px;
+      }
+
+      .status-row {
+        display: block;
+      }
+
+      .updated {
+        text-align: left;
+        margin-top: 4px;
+      }
+
+      .modal-backdrop {
+        padding: 10px;
+      }
+
+      .modal {
+        margin: 10px auto;
+        border-radius: 18px;
+      }
+
+      .modal-image {
+        height: 310px;
+      }
+
+      .modal-title {
+        font-size: 18px;
+      }
+
+      .detail-table {
+        grid-template-columns: 100px 1fr;
+        font-size: 13px;
       }
     }
   </style>
@@ -199,56 +432,131 @@
 
 <body>
   <header>
-    <h1>객실와인 리스트</h1>
+    <div class="title-row">
+      <h1>객실와인 리스트</h1>
+      <button class="refresh-btn" onclick="loadData()">↻ 새로고침</button>
+    </div>
 
-    <div class="filter-row">
+    <div class="control-panel">
       <select id="typeFilter">
         <option value="">전체 종류</option>
       </select>
 
-      <input id="searchInput" type="text" placeholder="와인명 / 관리번호 / 생산국 검색" />
+      <select id="sortFilter">
+        <option value="codeAsc">관리번호순</option>
+        <option value="nameAsc">이름순</option>
+        <option value="priceDesc">가격 높은순</option>
+        <option value="priceAsc">가격 낮은순</option>
+        <option value="qtyDesc">수량 많은순</option>
+      </select>
 
-      <button class="refresh-btn" onclick="loadData()">새로고침</button>
+      <input id="searchInput" type="text" placeholder="와인명 / 관리번호 / 생산국 / 보관장소 검색" />
+
+      <button id="stockToggle" class="toggle-btn" onclick="toggleStock()">0개 제외 OFF</button>
     </div>
   </header>
 
   <main>
-    <div id="summary" class="summary"></div>
+    <div class="status-row">
+      <div id="summary" class="summary"></div>
+      <div id="updated" class="updated"></div>
+    </div>
+
     <div id="list" class="grid"></div>
   </main>
 
+  <div id="modalBackdrop" class="modal-backdrop" onclick="closeModalByBackdrop(event)">
+    <div class="modal">
+      <div id="modalImage" class="modal-image"></div>
+
+      <div class="modal-body">
+        <div class="modal-top">
+          <div>
+            <div id="modalCode" class="code"></div>
+            <div id="modalTitle" class="modal-title"></div>
+          </div>
+          <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+
+        <div id="modalDetail" class="detail-table"></div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwrBety2WyvBIm6Pd02xs0rPQ_AeUyDdB5Q4WS9VDbaPp0SS11_2Th8YT27sFg08K3h/exec';
+
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwUtRnHW0J_bNOn7Eiwz_ccNgnaDxu2YIP_PBMNl6Ggz4PQ5FCduSkxvQlVzhZ4wJRr/exec';
 
     let allData = [];
+    let excludeZeroStock = false;
+    let imageCache = {};
 
     const typeFilter = document.getElementById('typeFilter');
+    const sortFilter = document.getElementById('sortFilter');
     const searchInput = document.getElementById('searchInput');
+    const stockToggle = document.getElementById('stockToggle');
     const list = document.getElementById('list');
     const summary = document.getElementById('summary');
+    const updated = document.getElementById('updated');
+
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const modalImage = document.getElementById('modalImage');
+    const modalCode = document.getElementById('modalCode');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDetail = document.getElementById('modalDetail');
+
+    function jsonp(url) {
+      return new Promise((resolve, reject) => {
+        const callbackName = 'jsonpCallback_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+
+        window[callbackName] = function(data) {
+          delete window[callbackName];
+          script.remove();
+          resolve(data);
+        };
+
+        const script = document.createElement('script');
+        const separator = url.includes('?') ? '&' : '?';
+
+        script.src = url + separator + 'callback=' + callbackName;
+
+        script.onerror = function() {
+          delete window[callbackName];
+          script.remove();
+          reject(new Error('JSONP load failed'));
+        };
+
+        document.body.appendChild(script);
+      });
+    }
 
     async function loadData() {
       list.innerHTML = '<div class="loading">불러오는 중...</div>';
       summary.textContent = '';
+      updated.textContent = '';
 
       try {
-        const res = await fetch(API_URL);
-        const json = await res.json();
+        const json = await jsonp(API_URL + '?action=list&ts=' + Date.now());
 
         if (!json.ok) {
           throw new Error(json.error || '데이터를 불러오지 못했습니다.');
         }
 
         allData = json.data || [];
+        imageCache = {};
 
         renderTypeOptions(json.types || []);
+        updated.textContent = json.updatedAt ? `업데이트: ${json.updatedAt}` : '';
+
         renderList();
 
       } catch (err) {
         list.innerHTML = `
           <div class="error">
             데이터를 불러오지 못했습니다.<br>
-            ${err.message}
+            ${escapeHtml(err.message)}
+            <br><br>
+            Apps Script URL 또는 배포 권한을 확인해주세요.
           </div>
         `;
       }
@@ -266,10 +574,26 @@
         typeFilter.appendChild(option);
       });
 
-      typeFilter.value = current;
+      if ([...typeFilter.options].some(opt => opt.value === current)) {
+        typeFilter.value = current;
+      }
     }
 
-    function renderList() {
+    function toggleStock() {
+      excludeZeroStock = !excludeZeroStock;
+
+      if (excludeZeroStock) {
+        stockToggle.classList.add('active');
+        stockToggle.textContent = '0개 제외 ON';
+      } else {
+        stockToggle.classList.remove('active');
+        stockToggle.textContent = '0개 제외 OFF';
+      }
+
+      renderList();
+    }
+
+    function getFilteredData() {
       const selectedType = typeFilter.value;
       const keyword = searchInput.value.trim().toLowerCase();
 
@@ -283,15 +607,49 @@
           item.vintage,
           item.country,
           item.storage,
+          item.quantity,
+          item.service,
+          item.receiveHistory,
+          item.purchaseHistory,
+          item.price,
           item.note
         ].join(' ').toLowerCase();
 
         const matchKeyword = !keyword || searchText.includes(keyword);
+        const matchStock = !excludeZeroStock || Number(item.quantityNumber || 0) > 0;
 
-        return matchType && matchKeyword;
+        return matchType && matchKeyword && matchStock;
       });
 
-      summary.textContent = `총 ${filtered.length}개 표시 중 / 전체 ${allData.length}개`;
+      const sortValue = sortFilter.value;
+
+      filtered.sort((a, b) => {
+        if (sortValue === 'nameAsc') {
+          return String(a.name || '').localeCompare(String(b.name || ''), 'ko');
+        }
+
+        if (sortValue === 'priceDesc') {
+          return Number(b.priceNumber || 0) - Number(a.priceNumber || 0);
+        }
+
+        if (sortValue === 'priceAsc') {
+          return Number(a.priceNumber || 0) - Number(b.priceNumber || 0);
+        }
+
+        if (sortValue === 'qtyDesc') {
+          return Number(b.quantityNumber || 0) - Number(a.quantityNumber || 0);
+        }
+
+        return String(a.code || '').localeCompare(String(b.code || ''), 'ko');
+      });
+
+      return filtered;
+    }
+
+    function renderList() {
+      const filtered = getFilteredData();
+
+      summary.textContent = `표시 ${filtered.length}개 / 전체 ${allData.length}개`;
 
       if (filtered.length === 0) {
         list.innerHTML = '<div class="empty">표시할 와인이 없습니다.</div>';
@@ -304,45 +662,35 @@
     }
 
     function createCard(item) {
-      const quantityClass = String(item.quantity).includes('0') ? 'qty-zero' : '';
+      const qtyNumber = Number(item.quantityNumber || 0);
+      const quantityClass = qtyNumber <= 0 ? 'zero' : '';
 
       return `
-        <div class="card">
-          <div class="image-wrap" data-code="${escapeHtml(item.code)}">
+        <div class="card" onclick="openModal('${escapeAttr(item.code)}')">
+          <div class="image-wrap" data-code="${escapeAttr(item.code)}">
+            <span class="badge">${escapeHtml(item.type || '-')}</span>
             사진 불러오는 중...
           </div>
 
-          <div class="content">
+          <div class="card-body">
             <div class="code">${escapeHtml(item.code)}</div>
             <div class="name">${escapeHtml(item.name)}</div>
 
+            <div class="quick-info">
+              <span class="chip">${escapeHtml(item.vintage || '빈티지 없음')}</span>
+              <span class="chip">${escapeHtml(item.country || '생산국 없음')}</span>
+              <span class="chip ${quantityClass}">수량 ${escapeHtml(item.quantity || '0')}</span>
+            </div>
+
             <div class="meta">
-              <div class="label">종류</div>
-              <div class="value">${escapeHtml(item.type)}</div>
-
-              <div class="label">빈티지</div>
-              <div class="value">${escapeHtml(item.vintage)}</div>
-
-              <div class="label">생산국</div>
-              <div class="value">${escapeHtml(item.country)}</div>
-
-              <div class="label">보관장소</div>
+              <div class="label">보관</div>
               <div class="value">${escapeHtml(item.storage)}</div>
-
-              <div class="label">보유수량</div>
-              <div class="value ${quantityClass}">${escapeHtml(item.quantity)}</div>
-
-              <div class="label">서비스</div>
-              <div class="value">${escapeHtml(item.service)}</div>
-
-              <div class="label">수령이력</div>
-              <div class="value">${escapeHtml(item.receiveHistory)}</div>
-
-              <div class="label">구매이력</div>
-              <div class="value">${escapeHtml(item.purchaseHistory)}</div>
 
               <div class="label">가격</div>
               <div class="value price">${escapeHtml(item.price)}</div>
+
+              <div class="label">수령</div>
+              <div class="value">${escapeHtml(shortText(item.receiveHistory, 45))}</div>
             </div>
 
             ${item.note ? `<div class="note">${escapeHtml(item.note)}</div>` : ''}
@@ -357,26 +705,109 @@
       imageBoxes.forEach(async box => {
         const code = box.dataset.code;
 
-        try {
-          const res = await fetch(`${API_URL}?action=image&code=${encodeURIComponent(code)}`);
-          const base64 = await res.text();
+        if (!code) {
+          box.textContent = '사진 없음';
+          return;
+        }
 
-          if (!base64 || base64.includes('Image not found')) {
-            box.textContent = '사진 없음';
+        try {
+          const imageData = await getImageData(code);
+
+          if (!imageData) {
+            box.innerHTML = `<span class="badge">사진 없음</span>사진 없음`;
             return;
           }
 
-          const img = document.createElement('img');
-          img.src = `data:image/jpeg;base64,${base64}`;
-          img.alt = code;
+          const typeBadge = box.querySelector('.badge')?.outerHTML || '';
 
-          box.innerHTML = '';
-          box.appendChild(img);
+          box.innerHTML = `
+            ${typeBadge}
+            <img src="${imageData}" alt="${escapeAttr(code)}">
+          `;
 
         } catch (err) {
-          box.textContent = '사진 로딩 실패';
+          box.innerHTML = `<span class="badge">오류</span>사진 로딩 실패`;
         }
       });
+    }
+
+    async function getImageData(code) {
+      if (imageCache[code] !== undefined) {
+        return imageCache[code];
+      }
+
+      const json = await jsonp(
+        `${API_URL}?action=image&code=${encodeURIComponent(code)}&ts=${Date.now()}`
+      );
+
+      if (!json.ok || !json.base64) {
+        imageCache[code] = '';
+        return '';
+      }
+
+      const dataUrl = `data:${json.mimeType || 'image/jpeg'};base64,${json.base64}`;
+      imageCache[code] = dataUrl;
+
+      return dataUrl;
+    }
+
+    async function openModal(code) {
+      const item = allData.find(x => x.code === code);
+      if (!item) return;
+
+      modalBackdrop.classList.add('show');
+
+      modalCode.textContent = item.code || '';
+      modalTitle.textContent = item.name || '';
+      modalImage.textContent = '사진 불러오는 중...';
+
+      modalDetail.innerHTML = `
+        ${detailRow('종류', item.type)}
+        ${detailRow('빈티지', item.vintage)}
+        ${detailRow('생산국', item.country)}
+        ${detailRow('보관장소', item.storage)}
+        ${detailRow('보유수량', item.quantity)}
+        ${detailRow('서비스 사용중', item.service)}
+        ${detailRow('수령 이력', item.receiveHistory)}
+        ${detailRow('구매 이력', item.purchaseHistory)}
+        ${detailRow('와인가격', item.price)}
+        ${detailRow('특이 사항', item.note)}
+      `;
+
+      try {
+        const imageData = await getImageData(item.code);
+
+        if (imageData) {
+          modalImage.innerHTML = `<img src="${imageData}" alt="${escapeAttr(item.code)}">`;
+        } else {
+          modalImage.textContent = '사진 없음';
+        }
+      } catch (err) {
+        modalImage.textContent = '사진 로딩 실패';
+      }
+    }
+
+    function detailRow(label, value) {
+      return `
+        <div class="detail-label">${escapeHtml(label)}</div>
+        <div class="detail-value">${escapeHtml(value || '-')}</div>
+      `;
+    }
+
+    function closeModal() {
+      modalBackdrop.classList.remove('show');
+    }
+
+    function closeModalByBackdrop(event) {
+      if (event.target === modalBackdrop) {
+        closeModal();
+      }
+    }
+
+    function shortText(value, maxLength) {
+      const text = String(value || '');
+      if (text.length <= maxLength) return text;
+      return text.slice(0, maxLength) + '...';
     }
 
     function escapeHtml(value) {
@@ -390,8 +821,19 @@
         .replaceAll("'", '&#039;');
     }
 
+    function escapeAttr(value) {
+      return escapeHtml(value).replaceAll('\n', ' ');
+    }
+
     typeFilter.addEventListener('change', renderList);
+    sortFilter.addEventListener('change', renderList);
     searchInput.addEventListener('input', renderList);
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
 
     loadData();
   </script>
