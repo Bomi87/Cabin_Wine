@@ -595,10 +595,19 @@
       });
     }
 
-    async function loadData() {
-      list.innerHTML = '<div class="loading">불러오는 중...</div>';
-      summary.textContent = '';
-      updated.textContent = '';
+async function loadData() {
+  // 새로고침 시 기본값으로 초기화
+  typeFilter.value = '';
+  sortFilter.value = 'codeAsc';
+  searchInput.value = '';
+
+  excludeZeroStock = false;
+  stockToggle.classList.remove('active');
+  stockToggle.textContent = '0 제외 OFF';
+
+  list.innerHTML = '<div class="loading">불러오는 중...</div>';
+  summary.textContent = '';
+  updated.textContent = '';
 
       try {
         const json = await jsonp(API_URL + '?action=list&ts=' + Date.now());
